@@ -7,6 +7,11 @@ from .autograd import Function, no_grad
 from .nn import Module, Parameter
 from . import nn
 from . import optim
+from .jarvis import JARVIS, JARVISBrain
 
 __version__ = "0.1.0"
-__all__ = ["Tensor", "Function", "no_grad", "Module", "Parameter", "nn", "optim"]
+__all__ = [
+    "Tensor", "Function", "no_grad", "Module", "Parameter",
+    "nn", "optim",
+    "JARVIS", "JARVISBrain",
+]

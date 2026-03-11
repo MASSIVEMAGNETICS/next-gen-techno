@@ -311,13 +311,73 @@ def test_next_gen_models():
     print("✓ Next-gen models tests passed")
 
 
+def test_jarvis():
+    """Test JARVIS AI assistant"""
+    print("Testing JARVIS AI assistant...")
+
+    from omega_tensor import JARVIS, JARVISBrain
+
+    # --- JARVISBrain ---
+    brain = JARVISBrain()
+
+    # tokenize produces correct length
+    tokens = JARVISBrain.tokenize("hello jarvis")
+    assert len(tokens) == 128
+
+    # keyword boost is non-zero for recognised keywords
+    boost = brain._keyword_boost("hello")
+    assert boost[brain.INTENTS.index("greeting")] > 0.0
+
+    # classify returns a valid intent string
+    intent = brain.classify("hello jarvis")
+    assert intent in brain.INTENTS
+
+    # All well-known keywords map to the expected intent
+    keyword_cases = [
+        ("hello there", "greeting"),
+        ("goodbye", "farewell"),
+        ("what time is it now", "time"),
+        ("run diagnostics", "system"),
+        ("calculate 2 plus 2", "compute"),
+        ("help me", "help"),
+    ]
+    for phrase, expected_intent in keyword_cases:
+        result = brain.classify(phrase)
+        assert result == expected_intent, (
+            f"classify('{phrase}') → '{result}', expected '{expected_intent}'"
+        )
+
+    # --- JARVIS ---
+    j = JARVIS(owner="Tester", verbose=False)
+
+    # Empty input
+    reply = j.respond("")
+    assert "Tester" in reply
+
+    # Non-empty input produces a non-empty string
+    reply = j.respond("hello jarvis")
+    assert isinstance(reply, str) and len(reply) > 0
+
+    # Round-robin: two calls with same intent return different canned responses
+    j2 = JARVIS(verbose=False)
+    r1 = j2._pick_response("status")
+    r2 = j2._pick_response("status")
+    assert r1 != r2
+
+    # Time-placeholder rendering
+    rendered = JARVIS._render_time_tokens("Time is {time}.")
+    assert "{time}" not in rendered
+
+    print("✓ JARVIS tests passed")
+
+
 def run_all_tests():
     """Run all tests"""
     print("=" * 60)
     print("Running Omega Tensor Tests")
     print("=" * 60)
     print()
-    
+
     test_tensor_creation()
     test_basic_operations()
     test_matrix_multiplication()
@@ -331,7 +391,8 @@ def run_all_tests():
     test_optimizers()
     test_decentralized_storage()
     test_next_gen_models()
-    
+    test_jarvis()
+
     print()
     print("=" * 60)
     print("All tests passed! ✓")
